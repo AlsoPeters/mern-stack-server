@@ -1,23 +1,29 @@
 const express = require('express');
 const app = express();
+const cors = require('cors');
 const mongoose = require('mongoose');
 const chalk = require('chalk');
 const FriendModel = require('./models/Friends');
 
+app.use(cors());
+app.use(express.json());
+
 // DATABASE CONNECTION
 mongoose.connect(
   'mongodb://localhost:27017/MERN?readPreference=primary&appname=MongoDB%20Compass&ssl=false',
-  { useNewUrlParser: true },
-  { useUnifiedTopology: true }
+  { useNewUrlParser: true, useUnifiedTopology: true }
 );
 
-app.get('/insert', async (req, res) => {
+app.post('/addfriend', async (req, res) => {
+  const name = req.body.name;
+  const age = req.body.age;
+
   const friend = new FriendModel({
-    name: 'John',
-    age: 98,
+    name: name,
+    age: age,
   });
   await friend.save();
-  res.send('Inserted DATA');
+  res.send('Success');
 });
 
 app.get('/read', async (req, res) => {
