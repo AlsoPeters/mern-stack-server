@@ -11,7 +11,7 @@ app.use(express.json());
 // DATABASE CONNECTION
 mongoose.connect(
   'mongodb://localhost:27017/MERN?readPreference=primary&appname=MongoDB%20Compass&ssl=false',
-  { useNewUrlParser: true, useUnifiedTopology: true }
+  { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false }
 );
 
 app.post('/addfriend', async (req, res) => {
@@ -23,7 +23,7 @@ app.post('/addfriend', async (req, res) => {
     age: age,
   });
   await friend.save();
-  res.send('Success');
+  res.send(friend);
 });
 
 app.get('/read', async (req, res) => {
@@ -34,6 +34,28 @@ app.get('/read', async (req, res) => {
       res.send(result);
     }
   });
+});
+
+app.put('/update', async (req, res) => {
+  const newAge = req.body.newAge;
+  const id = req.body.id;
+
+  try {
+    await FriendModel.findById(id, (error, friendToUpdate) => {
+      friendToUpdate.age = Number(newAge);
+      friendToUpdate.save();
+    });
+  } catch (err) {
+    console.log(err);
+  }
+
+  res.send('updated');
+});
+
+app.delete('/delete/:id', async (req, res) => {
+  const id = req.params.id;
+  await FriendModel.findByIdAndRemove(id);
+  res.send('item deleted');
 });
 
 app.listen(3001, () => {
